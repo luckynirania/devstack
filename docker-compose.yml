@@ -247,7 +247,7 @@ services:
     depends_on:
       - devpi
       - elasticsearch
-      - mysql
+      - mysql57
     image: edxops/notes:${OPENEDX_RELEASE:-latest}
     networks:
       default:
