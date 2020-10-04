@@ -3,7 +3,7 @@ version: "2.1"
 services:
   namenode:
     container_name: "edx.${COMPOSE_PROJECT_NAME:-devstack}.analytics_pipeline.namenode"
-    image: edxops/analytics_pipeline_hadoop_namenode:${OPENEDX_RELEASE:-latest}
+    image: edxops/analytics_pipeline_hadoop_namenode:${OPENEDX_RELEASE:-juniper.master}
     hostname: namenode
     environment:
       - CLUSTER_NAME=devstack
@@ -19,7 +19,7 @@ services:
 
   datanode:
     container_name: "edx.${COMPOSE_PROJECT_NAME:-devstack}.analytics_pipeline.datanode"
-    image: edxops/analytics_pipeline_hadoop_datanode:${OPENEDX_RELEASE:-latest}
+    image: edxops/analytics_pipeline_hadoop_datanode:${OPENEDX_RELEASE:-juniper.master}
     hostname: datanode
     environment:
       CORE_CONF_fs_defaultFS: "hdfs://namenode:8020"
@@ -37,7 +37,7 @@ services:
 
   resourcemanager:
     container_name: "edx.${COMPOSE_PROJECT_NAME:-devstack}.analytics_pipeline.resourcemanager"
-    image: edxops/analytics_pipeline_hadoop_resourcemanager:${OPENEDX_RELEASE:-latest}
+    image: edxops/analytics_pipeline_hadoop_resourcemanager:${OPENEDX_RELEASE:-juniper.master}
     hostname: resourcemanager
     environment:
       CORE_CONF_fs_defaultFS: "hdfs://namenode:8020"
@@ -58,7 +58,7 @@ services:
 
   nodemanager:
     container_name: "edx.${COMPOSE_PROJECT_NAME:-devstack}.analytics_pipeline.nodemanager"
-    image: edxops/analytics_pipeline_hadoop_nodemanager:${OPENEDX_RELEASE:-latest}
+    image: edxops/analytics_pipeline_hadoop_nodemanager:${OPENEDX_RELEASE:-juniper.master}
     hostname: nodemanager
     environment:
       CORE_CONF_fs_defaultFS: "hdfs://namenode:8020"
@@ -83,7 +83,7 @@ services:
 
   sparkmaster:
     container_name: "edx.${COMPOSE_PROJECT_NAME:-devstack}.analytics_pipeline.sparkmaster"
-    image: edxops/analytics_pipeline_spark_master:${OPENEDX_RELEASE:-latest}
+    image: edxops/analytics_pipeline_spark_master:${OPENEDX_RELEASE:-juniper.master}
     hostname: sparkmaster
     networks:
       default:
@@ -97,7 +97,7 @@ services:
 
   sparkworker:
     container_name: "edx.${COMPOSE_PROJECT_NAME:-devstack}.analytics_pipeline.sparkworker"
-    image: edxops/analytics_pipeline_spark_worker:${OPENEDX_RELEASE:-latest}
+    image: edxops/analytics_pipeline_spark_worker:${OPENEDX_RELEASE:-juniper.master}
     hostname: sparkworker
     depends_on:
       - sparkmaster
@@ -123,7 +123,7 @@ services:
 
   analyticspipeline:
     container_name: "edx.${COMPOSE_PROJECT_NAME:-devstack}.analytics_pipeline"
-    image: edxops/analytics_pipeline:${OPENEDX_RELEASE:-latest}
+    image: edxops/analytics_pipeline:${OPENEDX_RELEASE:-juniper.master}
     hostname: analyticspipeline
     volumes:
       - ${DEVSTACK_WORKSPACE}/edx-analytics-pipeline:/edx/app/analytics_pipeline/analytics_pipeline
