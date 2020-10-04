@@ -166,6 +166,7 @@ _clone2 ()
 {
 
     repos_to_clone=("$@")
+    cd "${DEVSTACK_WORKSPACE}"
     for repo in "${repos_to_clone[@]}"
     do
         # Use Bash's regex match operator to capture the name of the repo.
@@ -175,16 +176,23 @@ _clone2 ()
 
         # If a directory exists and it is nonempty, assume the repo has been checked out
         # and only make sure it's on the required branch
+        # echo "here1" "$(pwd)" "$name"
         if [ -d "$name" ] && [ -n "$(ls -A "$name" 2>/dev/null)" ]; then
+            # echo "here2" "$(pwd)"
             if [ ! -d "$name/.git" ]; then
                 printf "ERROR: [%s] exists but is not a git repo.\n" "$name"
                 exit 1
             fi
             printf "The [%s] repo is already checked out. Checking for updates.\n" "$name"
             cd "${DEVSTACK_WORKSPACE}/${name}"
+            # printf
+            
             _checkout_and_update_branch2
             cd ..
         else
+            # echo "hello" "$(pwd)"
+            
+            # echo "hello" "$(pwd)"
             if [ "${SHALLOW_CLONE}" == "1" ]; then
                 git clone --single-branch -b ${OUR_RELEASE} -c core.symlinks=true --depth=1 "${repo}"
             else
@@ -224,6 +232,8 @@ _checkout_and_update_branch2 ()
 clone ()
 {
     _clone "${repos[@]}"
+}
+clone2 () {
     _clone2 "${our_repos[@]}"
 }
 
@@ -276,6 +286,7 @@ if [ "$1" == "checkout" ]; then
     checkout
 elif [ "$1" == "clone" ]; then
     clone
+    clone2
 elif [ "$1" == "clone_ssh" ]; then
     clone_ssh
 elif [ "$1" == "whitelabel" ]; then
