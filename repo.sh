@@ -182,7 +182,7 @@ _clone2 ()
             fi
             printf "The [%s] repo is already checked out. Checking for updates.\n" "$name"
             cd "${DEVSTACK_WORKSPACE}/${name}"
-            _checkout_and_update_branch
+            _checkout_and_update_branch2
             cd ..
         else
             if [ "${SHALLOW_CLONE}" == "1" ]; then
@@ -204,6 +204,19 @@ _checkout_and_update_branch ()
     else
         git fetch origin ${OPENEDX_GIT_BRANCH}:${OPENEDX_GIT_BRANCH}
         git checkout ${OPENEDX_GIT_BRANCH}
+    fi
+    find . -name '*.pyc' -not -path './.git/*' -delete
+}
+
+_checkout_and_update_branch2 ()
+{
+    GIT_SYMBOLIC_REF="$(git symbolic-ref HEAD 2>/dev/null)"
+    BRANCH_NAME=${GIT_SYMBOLIC_REF##refs/heads/}
+    if [ "${BRANCH_NAME}" == "${OUR_RELEASE}" ]; then
+        git pull origin ${OUR_RELEASE}
+    else
+        git fetch origin ${OUR_RELEASE}:${OUR_RELEASE}
+        git checkout ${OUR_RELEASE}
     fi
     find . -name '*.pyc' -not -path './.git/*' -delete
 }
