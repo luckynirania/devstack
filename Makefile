@@ -129,7 +129,7 @@ dev.provision.services: ## Provision default services with local mounted directo
 dev.provision.services.%: ## Provision specified services with local mounted directories, separated by plus signs
 	$(WINPTY) bash ./provision.sh $*
 
-dev.provision: check-memory dev.clone.ssh dev.provision.services stop ## Provision dev environment with default services, and then stop them.
+dev.provision: check-memory dev.clone dev.provision.services stop ## Provision dev environment with default services, and then stop them.
 
 dev.cache-programs: ## Copy programs from Discovery to Memcached for use in LMS.
 	$(WINPTY) bash ./programs/provision.sh cache
