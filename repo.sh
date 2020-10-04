@@ -27,11 +27,14 @@ repos=(
     "https://github.com/edx/ecommerce.git"
     "https://github.com/edx/edx-e2e-tests.git"
     "https://github.com/edx/edx-notes-api.git"
-    "https://github.com/edx/edx-platform.git"
     "https://github.com/edx/xqueue.git"
     "https://github.com/edx/edx-analytics-pipeline.git"
     "https://github.com/edx/frontend-app-gradebook.git"
     "https://github.com/edx/frontend-app-publisher.git"
+)
+
+our_repos=(
+    "https://github.com/luckynirania/edx-platform.git"
 )
 
 non_release_repos=(
@@ -65,6 +68,9 @@ private_repos=(
     "https://github.com/edx/edx-themes.git"
 )
 
+OPENEDX_RELEASE=juniper.master
+OUR_RELEASE=paatha.initial
+
 if [ -n "${OPENEDX_RELEASE}" ]; then
     OPENEDX_GIT_BRANCH=open-release/${OPENEDX_RELEASE}
 else
@@ -96,9 +102,31 @@ _checkout ()
     done
 }
 
+_checkout2 ()
+{
+    repos_to_checkout=("$@")
+
+    for repo in "${repos_to_checkout[@]}"
+    do
+        # Use Bash's regex match operator to capture the name of the repo.
+        # Results of the match are saved to an array called $BASH_REMATCH.
+        [[ $repo =~ $name_pattern ]]
+        name="${BASH_REMATCH[1]}"
+
+        # If a directory exists and it is nonempty, assume the repo has been cloned.
+        if [ -d "$name" ] && [ -n "$(ls -A "$name" 2>/dev/null)" ]; then
+            echo "Checking out branch ${OUR_RELEASE} of $name"
+            cd "$name"
+            _checkout_and_update_branch
+            cd ..
+        fi
+    done
+}
+
 checkout ()
 {
     _checkout "${repos[@]}"
+    _checkout2 "${our_repos[@]}"
 }
 
 _clone ()
@@ -134,6 +162,39 @@ _clone ()
     cd - &> /dev/null
 }
 
+_clone2 ()
+{
+
+    repos_to_clone=("$@")
+    for repo in "${repos_to_clone[@]}"
+    do
+        # Use Bash's regex match operator to capture the name of the repo.
+        # Results of the match are saved to an array called $BASH_REMATCH.
+        [[ $repo =~ $name_pattern ]]
+        name="${BASH_REMATCH[1]}"
+
+        # If a directory exists and it is nonempty, assume the repo has been checked out
+        # and only make sure it's on the required branch
+        if [ -d "$name" ] && [ -n "$(ls -A "$name" 2>/dev/null)" ]; then
+            if [ ! -d "$name/.git" ]; then
+                printf "ERROR: [%s] exists but is not a git repo.\n" "$name"
+                exit 1
+            fi
+            printf "The [%s] repo is already checked out. Checking for updates.\n" "$name"
+            cd "${DEVSTACK_WORKSPACE}/${name}"
+            _checkout_and_update_branch
+            cd ..
+        else
+            if [ "${SHALLOW_CLONE}" == "1" ]; then
+                git clone --single-branch -b ${OUR_RELEASE} -c core.symlinks=true --depth=1 "${repo}"
+            else
+                git clone --single-branch -b ${OUR_RELEASE} -c core.symlinks=true "${repo}"
+            fi
+        fi
+    done
+    cd - &> /dev/null
+}
+
 _checkout_and_update_branch ()
 {
     GIT_SYMBOLIC_REF="$(git symbolic-ref HEAD 2>/dev/null)"
@@ -150,6 +211,7 @@ _checkout_and_update_branch ()
 clone ()
 {
     _clone "${repos[@]}"
+    _clone2 "${our_repos[@]}"
 }
 
 clone_ssh ()
